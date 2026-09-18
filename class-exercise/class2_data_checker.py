@@ -2,7 +2,16 @@ import argparse
 import csv
 import sys
 from pathlib import Path
+import logging
 
+# Set up logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s %(levelname)-8s %(message)s",
+    datefmt="%H:%M:%S"
+)
+# Create a module-level logger
+logger = logging.getLogger(__name__)
 
 def check_data(filename):
     """Read the CSV file and check for missing values."""
