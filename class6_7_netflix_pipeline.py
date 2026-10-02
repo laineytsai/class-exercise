@@ -4,11 +4,14 @@ import sys
 from pathlib import Path
 
 import pandas as pd
+from pyparsing import remove_quotes
 
 from class6_7_netflix_utils import (
     drop_missing_rows,
     remove_duplicates,
-    show_overview
+    show_overview,
+    remove_iqr_outliers,
+    clean_text
 )
 
 logger = logging.getLogger(__name__)
@@ -46,11 +49,29 @@ def main():
     show_overview(df)
     logger.info("Showed data overview")
 
+    df_original = df.copy()
+
     before = len(df)
     df = remove_duplicates(df)
     logger.info("Duplicates removed")
     df = drop_missing_rows(df)
     logger.info("Missing values removed")
+
+    try:
+        df = remove_iqr_outliers(df, "runtime_minutes", 1.5)
+    except ValueError:
+        sys.exit(1)
+    logger.info("Removing outliers using IQR")
+
+    for col in ["title", "type", "country"]:
+        df[col].apply(clean_text)
+        logger.info(f"Text Column {col} Cleaned")
+
+    report = {"rows_before": len(df_original), "rows_after": len(df), "rows_removed": len(df_original)}
+    logger.info(f"Report: {report}")
+
+    logger.info(f"{before-len(df)} rows have been removed")
+
 
 if __name__ == "__main__":
     main()
