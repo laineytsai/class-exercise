@@ -12,11 +12,7 @@ logger = logging.getLogger(__name__)
 
 def main():
     input_path = Path("data/messy_netflix_titles.csv")
-    # TODO 3:
-    # Inside a try/except block:
-    # Load the data and require columns: ["title", "type", "release_year"].
-    # Catch ValueError and exit with status code 1.
-    # Log an INFO
+
     try:
         df = load_netflix(input_path)
         valid_df = require_columns(df, ["title", "type", "release_year"])
