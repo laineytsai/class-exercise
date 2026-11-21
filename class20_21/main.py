@@ -4,7 +4,7 @@ from pathlib import Path
 import pandas as pd
 from fastapi import FastAPI, Query
 
-from check_analysis import summarize_genres, summarize_years
+from check_analysis import summarize_genres, summarize_years, filter_movies
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -27,4 +27,11 @@ def get_genres(min_movies: int = Query(default=1, ge=1)):
 def get_years(window: int = Query(default=3, ge=1)):
     result = summarize_years(df, window=window)
     logger.info(f"Returned year summary: group={len(result)}")
+    return result.to_dict(orient="records")
+
+
+@app.get("/analysis/filter", response_model=list[dict])
+def get_filtered_movies(min_rating: float = Query(default=8.0, ge=0, le=10)):
+    result = filter_movies(df, min_rating)
+    logger.info(f"Returned filtered movies: {len(df)}")
     return result.to_dict(orient="records")
